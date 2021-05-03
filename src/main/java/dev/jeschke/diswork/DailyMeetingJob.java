@@ -35,11 +35,10 @@ public class DailyMeetingJob implements Job {
         }
         logger.debug("execute(): Sending message");
         final LocalDateTime now = LocalDateTime.now();
-        channel.createMessage("Daily!").block();
-        channel.createMessage("Heute ist " + now.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.getDefault()) + ", der " + now.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG))).block();
-
-        if (Stream.of(Main.PRESENCE_DAYS.split(";")).map(DayOfWeek::valueOf).anyMatch(d -> d == now.getDayOfWeek())) {
-            channel.createMessage(Main.PRESENCE_NAME + " ist heute da!").block();
-        }
+        channel.createMessage(getMessage()).block());
+    }
+    private static String getMessage() {
+        return "**Daily!**\nHeute ist " + now.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.getDefault()) + ", der " + now.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG)) +
+        (Stream.of(Main.PRESENCE_DAYS.split(";")).map(DayOfWeek::valueOf).anyMatch(d -> d == now.getDayOfWeek())? ("\n" + Main.PRESENCE_NAME + " ist heute da!"):"");
     }
 }
