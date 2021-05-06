@@ -31,6 +31,18 @@ public class Main {
             throw new NullPointerException("Couldn't obtain a gateway.");
         }
 
+        if (args.length > 1 && args[0].equals("send")) {
+            final MessageChannel channel = gateway.getChannelById(Snowflake.of(DISCORD_CHANNEL))
+                    .map(MessageChannel.class::cast)
+                    .block();
+            if (channel == null) {
+                logger.error("execute(): Couldn't access channel");
+                throw new JobExecutionException("Couldn't access channel");
+            }
+            channel.createMessage(args[1]).block();
+            return;
+        }
+
         final Scheduler scheduler = StdSchedulerFactory.getDefaultScheduler();
         logger.debug("main(): Starting scheduler");
         scheduler.start();
