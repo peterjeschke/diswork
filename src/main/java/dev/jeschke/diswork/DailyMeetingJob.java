@@ -3,7 +3,6 @@ package dev.jeschke.diswork;
 import discord4j.common.util.Snowflake;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.object.entity.channel.MessageChannel;
-import discord4j.rest.util.Color;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -22,6 +21,7 @@ import static dev.jeschke.diswork.Main.DISCORD_CHANNEL;
 
 public class DailyMeetingJob implements Job {
     private static final Logger logger = LoggerFactory.getLogger(DailyMeetingJob.class);
+
     @Override
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
         logger.debug("execute(): Executing Job");
@@ -34,11 +34,22 @@ public class DailyMeetingJob implements Job {
             throw new JobExecutionException("Couldn't access channel");
         }
         logger.debug("execute(): Sending message");
-        final LocalDateTime now = LocalDateTime.now();
-        channel.createMessage(getMessage()).block());
+        channel.createMessage(getMessage()).block();
     }
+
     private static String getMessage() {
-        return "**Daily!**\nHeute ist " + now.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.getDefault()) + ", der " + now.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG)) +
-        (Stream.of(Main.PRESENCE_DAYS.split(";")).map(DayOfWeek::valueOf).anyMatch(d -> d == now.getDayOfWeek())? ("\n" + Main.PRESENCE_NAME + " ist heute da!"):"");
+        final LocalDateTime now = LocalDateTime.now();
+        final StringBuilder builder = new StringBuilder();
+        builder.append("**Daily!**\n");
+        builder.append("Heute ist ")
+                .append(now.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.getDefault()))
+                .append(", der ")
+                .append(now.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG)))
+                .append("\n");
+        if (Stream.of(Main.PRESENCE_DAYS.split(";")).map(DayOfWeek::valueOf).anyMatch(d -> d == now.getDayOfWeek())) {
+            builder.append(Main.PRESENCE_NAME)
+                    .append(" ist heute da!");
+        }
+        return builder.toString();
     }
 }
