@@ -46,7 +46,7 @@ public class DailyMeetingJob implements Job {
                 .append(", der ")
                 .append(now.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG)))
                 .append("\n");
-        if (Stream.of(Main.PRESENCE_DAYS.split(";")).map(DayOfWeek::valueOf).anyMatch(d -> d == now.getDayOfWeek())) {
+        if (!Main.PRESENCE_DAYS.isBlank() && Stream.of(Main.PRESENCE_DAYS.split(";")).map(DayOfWeek::valueOf).anyMatch(d -> d == now.getDayOfWeek())) {
             builder.append(Main.PRESENCE_NAME)
                     .append(" ist heute da!");
         }
